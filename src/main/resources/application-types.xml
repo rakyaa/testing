@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="Array" format="json">
+      <types:shape format="weave" example="examples/scatter.json"><![CDATA[%dw 2.0
+
+type Array = Array<{|  payload1: String,   payload2: String|}> {"example": "[{\\\"payload1\\\":\\\"\\\"},{\\\"payload2\\\":\\\"\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#a89060ad-f22b-459a-b14e-ae1d3707074a"/>
+</types:mule>

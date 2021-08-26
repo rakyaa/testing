@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="daf75ccc-83b1-41f8-821b-aa610288809e" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="forEach" doc:id="4f06abe5-0bdb-4295-8c87-01973c606417" >
+		<http:listener doc:name="Listener" doc:id="0f8c4014-aa78-4fe2-b664-f1fc5b8ffc37" path="/forEach" config-ref="HTTP_Listener_config"/>
+		<set-payload value="#[[1,2,3,4,5,6,7]]" doc:name="[1,2,3,4,5,6,7]" doc:id="8a4cd9bf-53a1-4b22-a9ee-aabb82858c5f" />
+		<foreach doc:name="For Each" doc:id="892398d8-61db-4cf9-aac3-1ce28bea85ba" >
+			<set-payload value="#[payload * 10]" doc:name="Set Payload" doc:id="4e4831d7-5659-482c-a5c4-868a615a8030" />
+			<logger level="INFO" doc:name="Logger" doc:id="06212fee-6d84-4d9c-ab7d-cba279544629" message="#[payload]"/>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="8bb3511f-d278-4657-8eec-3023fc7286d4" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="0f7835d7-d44a-44e6-8b1e-29eafa48cd8f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="forEachWithResult" doc:id="e4dcf32b-a89f-4350-abcc-071e509c69d0" >
+		<http:listener doc:name="Listener" doc:id="e2bbbef3-351f-47fa-ad6e-da8e695cdfe3" config-ref="HTTP_Listener_config" path="/forEachWithResult"/>
+		<set-payload value="#[[1,2,3,4,5,6,7]]" doc:name="[1,2,3,4,5,6,7]" doc:id="d760f50d-7e72-4261-aaac-bed2e075c5cb" />
+		<set-variable value="#[[]]" doc:name="[]" doc:id="8c384ac2-d6de-453d-b464-36b15993efe4" variableName="result"/>
+		<foreach doc:name="For Each" doc:id="e6cb2cdd-876b-42a4-bdb2-3486584b7202" >
+			<set-payload value="#[payload * 10]" doc:name="payload * 10" doc:id="7c506b74-b933-4aba-8eb1-b27f2d05c4a1" />
+			<logger level="INFO" doc:name="Logger" doc:id="ffdad10e-dda5-419b-9c5b-613c1c4be6e0" message="#[payload]"/>
+			<set-variable value="#[vars.result + payload]" doc:name="Set Variable" doc:id="b0f7f257-2ac5-43ea-b3ed-3c3402fa7453" variableName="result"/>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="5014334d-0f78-401a-aac3-3eb9cdcafa1b" message="#[vars.result]"/>
+		<ee:transform doc:name="Transform Message" doc:id="89a8ef78-99d2-4a19-a795-32b1ed3d9732" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.result
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="scatterGather" doc:id="339039e6-8fd4-4efa-bfc8-0367b9ed7b52" >
+		<http:listener doc:name="Listener" doc:id="bbabb365-e6c5-49f3-afad-41de1224686d" config-ref="HTTP_Listener_config" path="/scatterGather"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="21770d0d-7e9b-4ae0-a073-37265a25cfa4" >
+			<route >
+				<set-payload value="#[[1,2,3,4]]" doc:name="[1,2,3,4]" doc:id="c311a803-79e9-4ca7-8916-6062ecce9b9e" />
+			</route>
+			<route >
+				<set-payload value="#[[4,5,6,7]]" doc:name="[4,5,6,7]" doc:id="5fae1118-1e08-4bf7-97b0-db113656f93b" />
+			</route>
+			<route >
+				<set-payload value="#[[7,8,9,10]]" doc:name="[7,8,9,10]" doc:id="5d7db218-f387-4606-882f-09c557c86308" />
+			</route>
+		</scatter-gather>
+		<logger level="INFO" doc:name="Logger" doc:id="cd397eea-00b4-4b10-9eb1-7869ac7f5d27" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="a89060ad-f22b-459a-b14e-ae1d3707074a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	payload1 : payload."0".payload,
+	payload2 : payload."1".payload,
+	payload3 : payload."2".payload
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
