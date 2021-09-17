@@ -35,7 +35,7 @@
 						<muleVersion>4.3.0</muleVersion>
 						<username>rakchoud1</username>
 						<password>Rakesh@12345</password>
-						<applicationName>build_sonar_deploy</applicationName>
+						<applicationName>BuildSonarDeploy</applicationName>
 						<environment>Sandbox</environment>
 						<businessGroup>MuleSoft</businessGroup>
 						<workers>1</workers>
